@@ -1,1 +1,4 @@
 .env
+
+# 取得的 data folder
+data/
