@@ -3,6 +3,10 @@ import discord
 #client 是我們與 Discord 連結的橋樑
 client = discord.Client()
 
+from src import Utils
+# 載入 setting
+settings = Utils.Load_Setting()
+
 #調用 event 函式庫
 @client.event
 #當機器人完成啟動時
@@ -19,4 +23,4 @@ async def on_message(message):
     if message.content == 'ping':
         await message.channel.send('pong')
 
-client.run('OTAxNzI5NjU2MjYzMjc4NTkz.YXUHLw.YpH40eo68SFE9ou8SK73-CmoJIM') #TOKEN 在剛剛 Discord Developer 那邊「BOT」頁面裡面
+client.run(settings.dc_bot_token) #TOKEN 在剛剛 Discord Developer 那邊「BOT」頁面裡面
