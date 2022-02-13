@@ -37,7 +37,7 @@ class Bot:
         # send the text
         channel = guild.get_channel(target_channel)
         if channel != None:
-            await channel.send(target_text.format(user=f"<@{member.id}>"))
+            await channel.send(target_text.format(user=f"<@{member.id}>", count=guild.member_count))
         else:
             print(f"[Error] guild, {guild.name}, has no channel whose id is {target_channel}")
 
@@ -51,7 +51,7 @@ class Bot:
         # send the text
         channel = guild.get_channel(target_channel)
         if channel != None:
-            await channel.send(target_text.format(user=f"<@{member.id}>"))
+            await channel.send(target_text.format(user=f"<@{member.id}>", count=guild.member_count))
         else:
             print(f"[Error] guild, {guild.name}, has no channel whose id is {target_channel}")
     
