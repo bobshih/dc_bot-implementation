@@ -27,6 +27,20 @@ class Bot:
         else:
             print(f"[Warning] guild, {guild.name}, has been added in data.")
 
+    async def SendWelcomeMSG(self, guild: dGuild, member: Member)->None:
+        ''' send welcome message '''
+        if guild.id not in self.guilds:
+            print(f"[Error] guild, {guild.name} is not found")
+            return
+        target_channel = self.guilds[guild.id].welcome_channel
+        target_text = self.guilds[guild.id].welcome_text
+        # send the text
+        channel = guild.get_channel(target_channel)
+        if channel != None:
+            await channel.send(target_text.format(user=f"<@{member.id}>"))
+        else:
+            print(f"[Error] guild, {guild.name}, has no channel whose id is {target_channel}")
+
     async def SendLeaveMSG(self, guild: dGuild, member: Member)->None:
         ''' send leave message '''
         if guild.id not in self.guilds:
