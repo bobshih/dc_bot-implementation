@@ -13,7 +13,7 @@ from src.Bot import Bot
 from src.Bot.Entity import Member
 
 # a bot
-bot = Bot()
+bot = Bot(client)
 # 載入 setting
 settings = Utils.Load_Setting()
 
