@@ -3,8 +3,10 @@
 '''
 # from typing import Union
 from pathlib import Path
-
+from datetime import datetime
 import yaml
+
+from ..Bot.Entity import StreamInfo
 
 data_folder = Path('data')
 data_folder.mkdir(exist_ok=True)
@@ -50,3 +52,19 @@ def SaveGuildData(guild_id: int, guild_data: dict):
     guild_data_file = guild_folder/f"{guild_id}.yaml"
     with guild_data_file.open('w', encoding='utf8') as fp:
         yaml.dump(guild_data, fp, allow_unicode=True)
+
+def GetLiveStreamInfo(stream_data: dict)->StreamInfo:
+    ''' stream data 來自於 google yt api v3 '''
+    video_title = stream_data['items'][0]['snippet'].get('title')
+    # 提供此影片是否正在直播或是 upcoming 的資訊
+    live_broadcast_content = stream_data['snippet'].get("liveBroadcastContent")
+    description = stream_data['snippet'].get("description")
+    scheduled_start_time = datetime.strptime(stream_data['liveStreamingDetails'].get("scheduledStartTime"), "%Y-%m-%dT%H:%M:%SZ")
+    actual_end_time = stream_data['items'][0]['liveStreamingDetails'].get("actualEndTime")
+    return StreamInfo(
+        title=video_title,
+        live_status=live_broadcast_content,
+        description=description,
+        scheduled_start_time=scheduled_start_time,
+        actual_end_time=actual_end_time,
+    )
