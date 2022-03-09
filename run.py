@@ -12,10 +12,10 @@ from src import Utils
 from src.Bot import Bot
 from src.Bot.Entity import Member
 
-# a bot
-bot = Bot(client)
 # 載入 setting
 settings = Utils.Load_Setting()
+# a bot
+bot = Bot(client, settings.google_api_key)
 
 #調用 event 函式庫
 @client.event
