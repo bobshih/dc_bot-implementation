@@ -21,6 +21,7 @@ class ChannelData:
         self.last_stream_id = setting['last_stream_id']     # 最後追蹤到的直播 id
         # initialize other default values
         self.live = False
+        self.stream_id = ''         # 正在 stream 的 id
     
     def GetSetting(self):
         setting = {
