@@ -3,6 +3,7 @@
 '''
 from typing import List
 from discord import Guild as dGuild
+from src.Bot.Entity.Stream import StreamInfo
 
 from src.Utils.bot_utils import SaveGuildData
 
@@ -87,11 +88,17 @@ class Guild:
         self.leave_text = ' '.join(leave_txt)
         self.UpdateGuildFile()
 
-    def GetStartNotifyMSG(self, channel_id: str)->str:
+    def GetStartNotifyMSG(self, live_info: StreamInfo)->str:
         ''' 取得 開始直播 通知 '''
-        for channel in self.described_channels:
-            if channel.id == channel_id:
-                msg = self.start_stream_msg.format()
+        return self.start_stream_msg
+
+    def GetWaitingMSG(self, live_info: StreamInfo)->str:
+        ''' 取得 待機 的通知訊息 '''
+        return self.waiting_msg
+    
+    def GetEndMSG(self, live_info: StreamInfo)->str:
+        ''' 取得 結束直播 的通知訊息 '''
+        return self.end_stream_msg
 
     def GetSetting(self)->dict:
         ''' 取出 setting dict '''
