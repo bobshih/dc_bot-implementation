@@ -6,8 +6,6 @@ from pathlib import Path
 from datetime import datetime
 import yaml
 
-from ..Bot.Entity import StreamInfo
-
 data_folder = Path('data')
 data_folder.mkdir(exist_ok=True)
 guild_folder = data_folder/"Guilds"
@@ -53,15 +51,18 @@ def SaveGuildData(guild_id: int, guild_data: dict):
     with guild_data_file.open('w', encoding='utf8') as fp:
         yaml.dump(guild_data, fp, allow_unicode=True)
 
-def GetLiveStreamInfo(stream_data: dict)->StreamInfo:
+def GetLiveStreamInfo(stream_data: dict, video_id: str):
     ''' stream data 來自於 google yt api v3 '''
-    video_title = stream_data['items'][0]['snippet'].get('title')
+    video_title = stream_data['snippet'].get('title')
     # 提供此影片是否正在直播或是 upcoming 的資訊
     live_broadcast_content = stream_data['snippet'].get("liveBroadcastContent")
     description = stream_data['snippet'].get("description")
     scheduled_start_time = datetime.strptime(stream_data['liveStreamingDetails'].get("scheduledStartTime"), "%Y-%m-%dT%H:%M:%SZ")
-    actual_end_time = stream_data['items'][0]['liveStreamingDetails'].get("actualEndTime")
+    actual_end_time = stream_data['liveStreamingDetails'].get("actualEndTime")
+    video_url = f"https://www.youtube.com/watch?v={video_id}"
+    from ..Bot.Entity import StreamInfo
     return StreamInfo(
+        link=video_url,
         title=video_title,
         live_status=live_broadcast_content,
         description=description,
