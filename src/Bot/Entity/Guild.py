@@ -7,7 +7,7 @@ from src.Bot.Entity.Stream import StreamInfo
 
 from src.Utils.bot_utils import SaveGuildData
 
-from . import Member, ChannelData
+from . import ChannelData
 
 def _init_guild_setting(guild_setting: dict={}, discord_guild: dGuild = None)->dict:
     ''' 初始化 guild setting '''
@@ -17,8 +17,9 @@ def _init_guild_setting(guild_setting: dict={}, discord_guild: dGuild = None)->d
             'setting': {},
         }
     # guild related info
-    guild_setting['info']['name'] = discord_guild.name
-    guild_setting['info']['id'] = discord_guild.id
+    if discord_guild != None:
+        guild_setting['info']['name'] = discord_guild.name
+        guild_setting['info']['id'] = discord_guild.id
     # guild setting
     if 'welcome_channel' not in guild_setting:
         guild_setting['setting']['welcome_channel'] = -1
@@ -43,20 +44,17 @@ def _init_guild_setting(guild_setting: dict={}, discord_guild: dGuild = None)->d
         guild_setting['channel']['end_stream_msg'] = ''
     return guild_setting
 
-class Guild:
+class Guild_cls:
     @classmethod
     def Init_wGuild(cls, discord_guild: dGuild)->'Guild':
         new_setting = _init_guild_setting(discord_guild=discord_guild)
         return cls(new_setting)
 
     def __init__(self, guild_setting: dict={}):
+        guild_setting = _init_guild_setting(guild_setting=guild_setting)
         # guild info
         self.name = guild_setting['info']['name']
         self.id = guild_setting['info']['id']
-        # described channels
-        self.described_channels: List[ChannelData] = []
-        for channel_setting in guild_setting['channel']['channel_list']:
-            self.described_channels.append(ChannelData(channel_setting))
         # message settings
         self.welcome_text: str = guild_setting['setting']['welcome_text']
         self.welcome_channel: int = guild_setting['setting']['welcome_channel']
@@ -66,6 +64,13 @@ class Guild:
         self.waiting_msg: str = guild_setting['channel']['waiting_msg']
         self.start_stream_msg: str = guild_setting['channel']['start_stream_msg']
         self.end_stream_msg: str = guild_setting['channel']['end_stream_msg']
+        # described channels
+        self.described_channels: List[ChannelData] = []
+        for channel_setting in guild_setting['channel']['channel_list']:
+            if 'text_channel' not in channel_setting:
+                # channel_setting['text_channel'] = self.notify_text_channel
+                channel_setting['text_channel'] = ''
+            self.described_channels.append(ChannelData(channel_setting))
     
     def UpdateGuildFile(self)->None:
         ''' 更新 Guild File '''
@@ -90,15 +95,24 @@ class Guild:
 
     def GetStartNotifyMSG(self, live_info: StreamInfo)->str:
         ''' 取得 開始直播 通知 '''
-        return self.start_stream_msg
+        return self.start_stream_msg.format(
+            title=live_info.title,
+            link=live_info.link
+        )
 
     def GetWaitingMSG(self, live_info: StreamInfo)->str:
         ''' 取得 待機 的通知訊息 '''
-        return self.waiting_msg
+        return self.waiting_msg.format(
+            title=live_info.title,
+            link=live_info.link
+        )
     
     def GetEndMSG(self, live_info: StreamInfo)->str:
         ''' 取得 結束直播 的通知訊息 '''
-        return self.end_stream_msg
+        return self.end_stream_msg.format(
+            title=live_info.title,
+            link=live_info.link
+        )
 
     def GetSetting(self)->dict:
         ''' 取出 setting dict '''
