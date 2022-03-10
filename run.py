@@ -11,7 +11,7 @@ intents = discord.Intents(messages=True, guilds=True, members=True)
 client = discord.Client(intents=intents)
 from src import Utils
 from src.Bot import Bot
-from src.Bot.Entity import Member
+from src.Bot.Entity import Member_cls
 
 # 載入 setting
 settings = Utils.Load_Setting()
@@ -42,13 +42,13 @@ async def on_message(message: discord.Message):
 @client.event
 async def on_member_remove(member: discord.Member):
     print("[Debug] in on_member_remove")
-    leave_member = Member.Init_wMember(member)
+    leave_member = Member_cls.Init_wMember(member)
     await bot.SendLeaveMSG(member.guild, leave_member)
 
 @client.event
 async def on_member_join(member: discord.Member):
     print("[Debug] in on_member_join")
-    leave_member = Member.Init_wMember(member)
+    leave_member = Member_cls.Init_wMember(member)
     await bot.SendWelcomeMSG(member.guild, leave_member)
 
 @tasks.loop(minutes=1)
