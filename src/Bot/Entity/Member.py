@@ -3,9 +3,9 @@
 '''
 from discord import Member as dMember
 
-class Member:
+class Member_cls:
     @classmethod
-    def Init_wMember(cls, member: dMember)->'Member':
+    def Init_wMember(cls, member: dMember)->'Member_cls':
         new_member_setting = {
             'name': member.name,
             'nicky_name': member.display_name,
