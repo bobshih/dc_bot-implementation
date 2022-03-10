@@ -42,11 +42,13 @@ def _init_guild_setting(guild_setting: dict={}, discord_guild: dGuild = None)->d
         guild_setting['channel']['start_stream_msg'] = ''
     if 'end_stream_msg' not in guild_setting['channel']:           # 結束直播通知
         guild_setting['channel']['end_stream_msg'] = ''
+    if 'using_thread' not in guild_setting['channel']:              # 是否使用 thread
+        guild_setting['channel']['using_thread'] = False
     return guild_setting
 
 class Guild_cls:
     @classmethod
-    def Init_wGuild(cls, discord_guild: dGuild)->'Guild':
+    def Init_wGuild(cls, discord_guild: dGuild)->'Guild_cls':
         new_setting = _init_guild_setting(discord_guild=discord_guild)
         return cls(new_setting)
 
@@ -65,11 +67,11 @@ class Guild_cls:
         self.start_stream_msg: str = guild_setting['channel']['start_stream_msg']
         self.end_stream_msg: str = guild_setting['channel']['end_stream_msg']
         # described channels
+        self.using_thread: bool = guild_setting['channel']['using_thread']
         self.described_channels: List[ChannelData] = []
         for channel_setting in guild_setting['channel']['channel_list']:
             if 'text_channel' not in channel_setting:
-                # channel_setting['text_channel'] = self.notify_text_channel
-                channel_setting['text_channel'] = ''
+                channel_setting['text_channel'] = self.notify_text_channel
             self.described_channels.append(ChannelData(channel_setting))
     
     def UpdateGuildFile(self)->None:
@@ -93,23 +95,44 @@ class Guild_cls:
         self.leave_text = ' '.join(leave_txt)
         self.UpdateGuildFile()
 
-    def GetStartNotifyMSG(self, live_info: StreamInfo)->str:
-        ''' 取得 開始直播 通知 '''
-        return self.start_stream_msg.format(
+    def GetStartNotifyMSG(self, channel_id: str, live_info: StreamInfo)->str:
+        ''' 取得 開始直播 通知，要根據不同 channel 取得不同的訊息 '''
+        msg = ''
+        for channel_data in self.described_channels:
+            if channel_data.id == channel_id:
+                msg = channel_data.start_msg
+                break
+        if msg == '':
+            msg = self.start_stream_msg
+        return msg.format(
             title=live_info.title,
             link=live_info.link
         )
 
-    def GetWaitingMSG(self, live_info: StreamInfo)->str:
-        ''' 取得 待機 的通知訊息 '''
-        return self.waiting_msg.format(
+    def GetWaitingMSG(self, channel_id: str, live_info: StreamInfo)->str:
+        ''' 取得 待機 的通知訊息，要根據不同 channel 取得不同的訊息 '''
+        msg = ''
+        for channel_data in self.described_channels:
+            if channel_data.id == channel_id:
+                msg = channel_data.start_msg
+                break
+        if msg == '':
+            msg = self.waiting_msg
+        return msg.format(
             title=live_info.title,
             link=live_info.link
         )
-    
-    def GetEndMSG(self, live_info: StreamInfo)->str:
-        ''' 取得 結束直播 的通知訊息 '''
-        return self.end_stream_msg.format(
+
+    def GetEndMSG(self, channel_id: str, live_info: StreamInfo)->str:
+        ''' 取得 結束直播 的通知訊息，要根據不同 channel 取得不同的訊息 '''
+        msg = ''
+        for channel_data in self.described_channels:
+            if channel_data.id == channel_id:
+                msg = channel_data.start_msg
+                break
+        if msg == '':
+            msg = self.end_stream_msg
+        return msg.format(
             title=live_info.title,
             link=live_info.link
         )

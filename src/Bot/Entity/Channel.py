@@ -10,9 +10,15 @@ def _init_channel_setting(setting):
     if 'last_stream_id' not in setting:
         setting['last_stream_id'] = ''
     if 'text_channel' not in setting:
-        setting['text_channel'] = ''
+        setting['text_channel'] = -1
     if 'thread_id' not in setting:
         setting['thread_id'] = ''
+    if 'end_msg' not in setting:
+        setting['end_msg'] = ''
+    if 'start_msg' not in setting:
+        setting['start_msg'] = ''
+    if 'wait_msg' not in setting:
+        setting['wait_msg'] = -1
 
 class ChannelData:
     def __init__(self, setting: dict):
@@ -22,6 +28,10 @@ class ChannelData:
         self.last_stream_id = setting['last_stream_id']     # 最後追蹤到的直播 id
         self.text_channel = setting['text_channel']
         self.thread_id = setting['thread_id']
+        # custom messages
+        self.end_msg = setting['end_msg']
+        self.start_msg = setting['start_msg']
+        self.wait_msg = setting['wait_msg']
         # initialize other default values
         self.live = False
         self.stream_id = ''         # 正在 stream 的 id
@@ -33,5 +43,8 @@ class ChannelData:
             "last_stram_id": self.last_stream_id,
             "text_channel": self.text_channel,
             "thread_id": self.thread_id,
+            'end_msg': self.end_msg,
+            'start_msg': self.start_msg,
+            'wait_msg': self.wait_msg,
         }
         return setting
