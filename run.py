@@ -3,6 +3,7 @@ import yaml
 
 #導入 Discord.py
 import discord
+from discord.ext import tasks
 
 #client 是我們與 Discord 連結的橋樑
 # 控制 bot 有哪些權限，同時必須在
@@ -50,4 +51,9 @@ async def on_member_join(member: discord.Member):
     leave_member = Member.Init_wMember(member)
     await bot.SendWelcomeMSG(member.guild, leave_member)
 
+@tasks.loop(minutes=1)
+async def BotWorking():
+    await bot.DoTasks()
+
+BotWorking.start()
 client.run(settings.dc_bot_token) #TOKEN 在剛剛 Discord Developer 那邊「BOT」頁面裡面
