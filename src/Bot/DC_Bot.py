@@ -5,7 +5,8 @@ from collections import defaultdict
 from discord import (
     Guild as dGuild,
     Message as dMessage,
-    Client
+    Client,
+    TextChannel as dTextChannel,
 )
 import requests
 from datetime import datetime
@@ -109,21 +110,30 @@ class Bot:
                     # 檢查是否超過 7 天，如果超過七天就不通知
                     if (live_info.scheduled_start_time - datetime.now()).days >= 7:
                         continue
-                    message = self.guilds[guild_id].GetWaitingMSG(live_info)
-                    result[guild_id].append((channel_data.text_channel, message))
+                    message = self.guilds[guild_id].GetWaitingMSG(channel_data.id, live_info)
+                    if guild.using_thread:
+                        result[guild_id].append((channel_data.text_channel, channel_data.thread_id, message))
+                    else:
+                        result[guild_id].append((channel_data.text_channel, None, message))
                 elif live_info.live_status == 'live' and not channel_data.live:
                     # 切換成 live 模式，送出 live string
                     channel_data.live = True
-                    message = self.guilds[guild_id].GetStartNotifyMSG(live_info)
-                    result[guild_id].append((channel_data.text_channel, message))
+                    message = self.guilds[guild_id].GetStartNotifyMSG(channel_data.id, live_info)
+                    if guild.using_thread:
+                        result[guild_id].append((channel_data.text_channel, channel_data.thread_id, message))
+                    else:
+                        result[guild_id].append((channel_data.text_channel, None, message))
                 elif live_info.end_time != None:        # 已經有結束時間，表示直播結束了
                     # 更新 channel data 去激活 CheckLiveStreaming 的工作
                     channel_data.last_stream_id = channel_data.stream_id
                     channel_data.stream_id = ''
                     channel_data.live = False
                     # 取得 end msg
-                    message = self.guilds[guild_id].GetEndMSG(live_info)
-                    result[guild_id].append((channel_data.text_channel, message))
+                    message = self.guilds[guild_id].GetEndMSG(channel_data.id, live_info)
+                    if guild.using_thread:
+                        result[guild_id].append((channel_data.text_channel, channel_data.thread_id, message))
+                    else:
+                        result[guild_id].append((channel_data.text_channel, None, message))
         return dict(result)
 
     async def DoTasks(self)->None:
@@ -135,9 +145,10 @@ class Bot:
         # 3. send messages to each guild
         for _, messages in guild_messages.items():
             # channel_id = self.guilds[guild_id].notify_text_channel
-            for channel_id, msg in messages:
-                notify_channel = await self.client.fetch_channel(channel_id)
+            for channel_id, thread_id, msg in messages:
+                notify_channel: dTextChannel = await self.client.fetch_channel(channel_id)
                 await notify_channel.send(msg)
+                # 以後再處理 thread 問題，discord 版本需要到 2.0
 
     async def ProcessMessage(self, message: dMessage)->None:
         ''' process the message '''
