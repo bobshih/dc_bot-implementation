@@ -3,9 +3,10 @@
 '''
 from typing import List
 from discord import Guild as dGuild
-from src.Bot.Entity.Stream import StreamInfo
+from .Stream import StreamInfo
 
-from src.Utils.bot_utils import SaveGuildData
+from ...Utils.bot_utils import SaveGuildData
+from ...Utils.message_utils import GetChannelRelatedMessage
 
 from . import ChannelData
 
@@ -97,45 +98,52 @@ class Guild_cls:
 
     def GetStartNotifyMSG(self, channel_id: str, live_info: StreamInfo)->str:
         ''' 取得 開始直播 通知，要根據不同 channel 取得不同的訊息 '''
-        msg = ''
-        for channel_data in self.described_channels:
+        msg, cid = '', -1
+        for idx, channel_data in enumerate(self.described_channels):
             if channel_data.id == channel_id:
                 msg = channel_data.start_msg
+                cid = idx
                 break
         if msg == '':
             msg = self.start_stream_msg
-        return msg.format(
-            title=live_info.title,
-            link=live_info.link
-        )
+        assert cid != -1, f"[Error] in GetStartNotifyMSG, unable to find the channel with the channel id, {channel_id}"
+        return GetChannelRelatedMessage(msg, self.described_channels[cid], live_info)
 
     def GetWaitingMSG(self, channel_id: str, live_info: StreamInfo)->str:
         ''' 取得 待機 的通知訊息，要根據不同 channel 取得不同的訊息 '''
-        msg = ''
-        for channel_data in self.described_channels:
+        msg, cid = '', -1
+        for idx, channel_data in enumerate(self.described_channels):
             if channel_data.id == channel_id:
                 msg = channel_data.start_msg
+                cid = idx
                 break
         if msg == '':
             msg = self.waiting_msg
-        return msg.format(
-            title=live_info.title,
-            link=live_info.link
-        )
+        assert cid != -1, f"[Error] in GetWaitingMSG, unable to find the channel with the channel id, {channel_id}"
+        return GetChannelRelatedMessage(msg, self.described_channels[cid], live_info)
 
     def GetEndMSG(self, channel_id: str, live_info: StreamInfo)->str:
         ''' 取得 結束直播 的通知訊息，要根據不同 channel 取得不同的訊息 '''
-        msg = ''
-        for channel_data in self.described_channels:
+        msg, cid = '', -1
+        for idx, channel_data in enumerate(self.described_channels):
             if channel_data.id == channel_id:
                 msg = channel_data.start_msg
+                cid = idx
                 break
         if msg == '':
             msg = self.end_stream_msg
-        return msg.format(
-            title=live_info.title,
-            link=live_info.link
-        )
+        assert cid != -1, f"[Error] in GetEndMSG, unable to find the channel with the channel id, {channel_id}"
+        return GetChannelRelatedMessage(msg, self.described_channels[cid], live_info)
+
+    def ResetChannelStatus(self, channel_id: str)->str:
+        ''' 重新設定 Channel 的狀態，這個動作執行完之後應該重新檢查一次所有 channel 狀態，藉此通知大家 '''
+        for channel_data in self.described_channels:
+            if channel_data.id == channel_id:
+                channel_data.Reset()
+                return "[Success] 成功重制了頻道狀態"
+        self.described_channels.append(ChannelData({'id': channel_id}))
+        self.UpdateGuildFile()
+        return "[Error] 沒有找到對應的頻道，請確認輸入的 Channel ID 是否正確"
 
     def AddDescribedChannel(self, channel_id: str)->str:
         ''' 新增一個 channel，會輸出一個字串通知使用者結果如何 '''
