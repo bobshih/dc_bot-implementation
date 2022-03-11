@@ -231,9 +231,19 @@ class Bot:
                 else:
                     await channel.send("看不懂的指令")
             if len(sub_commands) >= 3:
-                data_name, channel_id = sub_commands[0], sub_commands[1]
-                new_content = ' '.join(sub_commands[2:])
-                response = self.guilds[guild_id].UpdateChannelData(channel_id, data_name, new_content)
+                if sub_commands[0] == 'update-general-end-msg':
+                    self.guilds[guild_id].end_stream_msg = ' '.join(sub_commands[1:])
+                    response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                elif sub_commands[0] == 'update-general-start-msg':
+                    self.guilds[guild_id].start_stream_msg = ' '.join(sub_commands[1:])
+                    response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                elif sub_commands[0] == 'update-general-wait-msg':
+                    self.guilds[guild_id].waiting_msg = ' '.join(sub_commands[1:])
+                    response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                else:
+                    data_name, channel_id = sub_commands[0], sub_commands[1]
+                    new_content = ' '.join(sub_commands[2:])
+                    response = self.guilds[guild_id].UpdateChannelData(channel_id, data_name, new_content)
             self.guilds[guild_id].UpdateGuildFile()
             if response != '':
                 await channel.send(response)
