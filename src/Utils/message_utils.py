@@ -8,7 +8,7 @@ from ..Bot.Entity import ChannelData
 from ..Bot.Entity.Stream import StreamInfo
 
 def GetChannelRelatedMessage(ori_msg: str, channel_data: ChannelData, stream_info: StreamInfo)->str:
-    utc_timezone = int(os.getenv("UTC_TIMEZONE"))
+    utc_timezone = int(os.environ['UTC_TIMEZONE'])
     notified_target = "Unknown Target"
     if channel_data.notified_target_type == 'tag':
         notified_target = f"<@&{channel_data.notified_target}>"
