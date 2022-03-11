@@ -218,10 +218,10 @@ class Bot:
                     response = '[Success] yt 提醒通知的一般結束訊息已更新'
                 elif sub_commands[0] == 'update-general-start-msg':
                     self.guilds[guild_id].start_stream_msg = sub_commands[1]
-                    response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                    response = '[Success] yt 提醒通知的一般開始訊息已更新'
                 elif sub_commands[0] == 'update-general-wait-msg':
                     self.guilds[guild_id].waiting_msg = sub_commands[1]
-                    response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                    response = '[Success] yt 提醒通知的一般等待訊息已更新'
                 elif sub_commands[0] == 'delete-channel':
                     response = self.guilds[guild_id].DeleteChannel(sub_commands[1])
                 elif sub_commands[0] == 'reset-status':
