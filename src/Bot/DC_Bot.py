@@ -222,6 +222,8 @@ class Bot:
                 elif sub_commands[0] == 'update-general-wait-msg':
                     self.guilds[guild_id].waiting_msg = sub_commands[1]
                     response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                elif sub_commands[0] == 'delete-channel':
+                    response = self.guilds[guild_id].DeleteChannel(sub_commands[1])
                 elif sub_commands[0] == 'reset-status':
                     response = self.guilds[guild_id].ResetChannelStatus(sub_commands[1])
                     if 'success' in response.lower():
