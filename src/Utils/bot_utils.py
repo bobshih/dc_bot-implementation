@@ -58,7 +58,8 @@ def GetLiveStreamInfo(stream_data: dict, video_id: str):
     live_broadcast_content = stream_data['snippet'].get("liveBroadcastContent")
     description = stream_data['snippet'].get("description")
     scheduled_start_time = datetime.strptime(stream_data['liveStreamingDetails'].get("scheduledStartTime"), "%Y-%m-%dT%H:%M:%SZ")
-    actual_end_time = stream_data['liveStreamingDetails'].get("actualEndTime")
+    actual_start_time = datetime.strptime(stream_data['liveStreamingDetails'].get("actualStartTime"), "%Y-%m-%dT%H:%M:%SZ")
+    actual_end_time = datetime.strptime(stream_data['liveStreamingDetails'].get("actualEndTime"), "%Y-%m-%dT%H:%M:%SZ")
     video_url = f"https://www.youtube.com/watch?v={video_id}"
     from ..Bot.Entity import StreamInfo
     return StreamInfo(
@@ -67,5 +68,6 @@ def GetLiveStreamInfo(stream_data: dict, video_id: str):
         live_status=live_broadcast_content,
         description=description,
         scheduled_start_time=scheduled_start_time,
+        actual_start_time=actual_start_time,
         actual_end_time=actual_end_time,
     )
