@@ -135,14 +135,24 @@ class Guild_cls:
         assert cid != -1, f"[Error] in GetEndMSG, unable to find the channel with the channel id, {channel_id}"
         return GetChannelRelatedMessage(msg, self.described_channels[cid], live_info)
 
+    def DeleteChannel(self, channel_id: str)->str:
+        ''' 刪除某個 channel '''
+        found_idx = None
+        for idx, channel_data in enumerate(self.described_channels):
+            if channel_data.id == channel_id:
+                found_idx = idx
+        if found_idx != None:
+            self.described_channels.pop(found_idx)
+            self.UpdateGuildFile()
+            return f"[Success] 成功刪除 Channel, {channel_id}"
+        return "[Error] 沒有找到對應的頻道來刪除，請確認輸入的 Channel ID 是否正確"
+
     def ResetChannelStatus(self, channel_id: str)->str:
         ''' 重新設定 Channel 的狀態，這個動作執行完之後應該重新檢查一次所有 channel 狀態，藉此通知大家 '''
         for channel_data in self.described_channels:
             if channel_data.id == channel_id:
                 channel_data.Reset()
                 return "[Success] 成功重制了頻道狀態"
-        self.described_channels.append(ChannelData({'id': channel_id}))
-        self.UpdateGuildFile()
         return "[Error] 沒有找到對應的頻道，請確認輸入的 Channel ID 是否正確"
 
     def AddDescribedChannel(self, channel_id: str)->str:
