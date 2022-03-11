@@ -18,7 +18,7 @@ def _init_channel_setting(setting):
     if 'start_msg' not in setting:
         setting['start_msg'] = ''
     if 'wait_msg' not in setting:
-        setting['wait_msg'] = -1
+        setting['wait_msg'] = ''
     if 'target' not in setting:
         setting['target'] = -1
     if 'target_type' not in setting:
