@@ -72,7 +72,7 @@ class Bot:
             要把 Live 資訊放到 channel.stream_id
         '''
         for guild_id, guild in self.guilds.items():
-            if guild.notify_text_channel == '': continue
+            if guild.notify_text_channel == -1: continue
             for channel_data in guild.described_channels:
                 if channel_data.live:       # 已經在 live 了，不用檢查了
                     continue
@@ -81,11 +81,14 @@ class Bot:
                 page = requests.get(f"https://youtube.com/channel/{channel_data.id}/live")
                 page_soup = BeautifulSoup(page.text, 'html.parser')
                 # 取得轉址後的 html url
-                link = page_soup.find('link', {'rel': 'canonical'})
-                href_html = link.get('href')
-                if 'watch?v=' in href_html:
-                    live_streaming_id = href_html.split('watch?v=')[1]
-                    channel_data.stream_id = live_streaming_id         # 在此更新 stream id
+                try:
+                    link = page_soup.find('link', {'rel': 'canonical'})
+                    href_html = link.get('href')
+                    if 'watch?v=' in href_html:
+                        live_streaming_id = href_html.split('watch?v=')[1]
+                        channel_data.stream_id = live_streaming_id         # 在此更新 stream id
+                except:
+                    pass
         #             result[guild_id].append((channel_data.id, live_streaming_id))
         # return dict(result)
 
@@ -96,10 +99,11 @@ class Bot:
         '''
         result = defaultdict(list)
         for guild_id, guild in self.guilds.items():
-            if guild.notify_text_channel == '': continue
+            if guild.notify_text_channel == -1: continue
             for channel_data in guild.described_channels:
                 if channel_data.stream_id == '':                # 沒有 stream id 表示沒有待機室或是直播
                     continue
+                notified_channel = channel_data.text_channel if channel_data.text_channel != -1 else guild.notify_text_channel
                 yt_api_url = "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
                     channel_data.stream_id, self.google_api_key
                 )
@@ -118,17 +122,17 @@ class Bot:
                     else:
                         message = ''
                     if guild.using_thread:
-                        result[guild_id].append((channel_data.text_channel, channel_data.thread_id, message))
+                        result[guild_id].append((notified_channel, channel_data.thread_id, message))
                     else:
-                        result[guild_id].append((channel_data.text_channel, None, message))
+                        result[guild_id].append((notified_channel, None, message))
                 elif live_info.live_status == 'live' and not channel_data.live:
                     # 切換成 live 模式，送出 live string
                     channel_data.live = True
                     message = self.guilds[guild_id].GetStartNotifyMSG(channel_data.id, live_info)
                     if guild.using_thread:
-                        result[guild_id].append((channel_data.text_channel, channel_data.thread_id, message))
+                        result[guild_id].append((notified_channel, channel_data.thread_id, message))
                     else:
-                        result[guild_id].append((channel_data.text_channel, None, message))
+                        result[guild_id].append((notified_channel, None, message))
                 elif live_info.end_time != None:        # 已經有結束時間，表示直播結束了
                     # 更新 channel data 去激活 CheckLiveStreaming 的工作
                     channel_data.last_stream_id = channel_data.stream_id
@@ -137,9 +141,9 @@ class Bot:
                     # 取得 end msg
                     message = self.guilds[guild_id].GetEndMSG(channel_data.id, live_info)
                     if guild.using_thread:
-                        result[guild_id].append((channel_data.text_channel, channel_data.thread_id, message))
+                        result[guild_id].append((notified_channel, channel_data.thread_id, message))
                     else:
-                        result[guild_id].append((channel_data.text_channel, None, message))
+                        result[guild_id].append((notified_channel, None, message))
         return dict(result)
 
     async def DoTasks(self)->None:
@@ -164,11 +168,12 @@ class Bot:
         ''' process the message '''
         guild_id = message.guild.id
         channel = message.channel
-        message_segs = message.content[len(BotPrefix):].strip().split(' ')
+        message_segs = message.content[len(BotPrefix):].strip().split()
         if len(message_segs) < 2:
             await channel.send("看不懂的指令")
             return
         command, sub_commands = message_segs[0], message_segs[1:]
+        response = ''
         if command == 'Welcome':
             sub_commands = sub_commands[0]
             content = sub_commands[1]
@@ -225,9 +230,9 @@ class Bot:
                         return
                 else:
                     await channel.send("看不懂的指令")
-            if len(sub_commands) == 3:
+            if len(sub_commands) >= 3:
                 data_name, channel_id = sub_commands[0], sub_commands[1]
-                new_content = sub_commands[2]
+                new_content = ' '.join(sub_commands[2:])
                 response = self.guilds[guild_id].UpdateChannelData(channel_id, data_name, new_content)
             self.guilds[guild_id].UpdateGuildFile()
             if response != '':
