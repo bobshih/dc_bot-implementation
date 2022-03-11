@@ -51,15 +51,11 @@ async def on_member_join(member: discord.Member):
     leave_member = Member_cls.Init_wMember(member)
     await bot.SendWelcomeMSG(member.guild, leave_member)
 
-count = 0
 @tasks.loop(minutes=1)
 async def BotWorking():
     await bot.DoTasks()
-    count += 1
-    if count == 5:
-        count = 0
-        for _, guild in bot.guilds.items():
-            guild.UpdateGuildFile()
+    for _, guild in bot.guilds.items():
+        guild.UpdateGuildFile()
 
 BotWorking.start()
 client.run(settings.dc_bot_token) #TOKEN 在 Discord Developer 那邊「BOT」頁面裡面
