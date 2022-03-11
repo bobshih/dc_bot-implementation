@@ -137,6 +137,36 @@ class Guild_cls:
             link=live_info.link
         )
 
+    def AddDescribedChannel(self, channel_id: str)->str:
+        ''' 新增一個 channel，會輸出一個字串通知使用者結果如何 '''
+        for channel_data in self.described_channels:
+            if channel_data.id == channel_id:
+                return "[Error] 已經有相同 ID 的 yt 頻道了，請使用修改的指令修改內容"
+        self.described_channels.append(ChannelData({'id': channel_id}))
+        self.UpdateGuildFile()
+        return "[Success] 成功加入一個新頻道，請使用此 ID 去修改相關資訊"
+    
+    def UpdateChannelData(self, channel_id: str, data_type: str, new_content: str)->str:
+        '''
+            更新 Channel 資料，過程中會檢查是否有對應的 Channel
+            最後輸出一個字串，表示結果
+            若有錯，也會以字串形式輸出
+        '''
+        for channel_data in self.described_channels:
+            if channel_data.id == channel_id:
+                if not hasattr(channel_data, data_type):
+                    return '[Error] channel data 中並沒有此設定可以被更新'
+                ori_data = getattr(channel_data, data_type)
+                if type(ori_data) == int:
+                    if new_content.isdigit():
+                        new_content = int(new_content)
+                    else:
+                        return f'[Error] {data_type} 只接受數字'
+                setattr(channel_data, data_type, new_content)
+                self.UpdateGuildFile()
+                return f"[Success] 更新了 {channel_id} 的 {data_type} 為 {getattr(channel_data, data_type)}"
+        return '[Error] 這個 channel id 並不在訂閱清單中，請先用 add-new-channel 進行訂閱'
+
     def GetSetting(self)->dict:
         ''' 取出 setting dict '''
         result = {
