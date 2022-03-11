@@ -217,6 +217,12 @@ class Bot:
                 elif sub_commands[0] == 'update-general-wait-msg':
                     self.guilds[guild_id].waiting_msg = sub_commands[1]
                     response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                elif sub_commands[0] == 'reset-status':
+                    response = self.guilds[guild_id].ResetChannelStatus(sub_commands[1])
+                    if 'success' in response.lower():
+                        await channel.send(response)
+                        await self.DoTasks()
+                        return
                 else:
                     await channel.send("看不懂的指令")
             if len(sub_commands) == 3:

@@ -19,6 +19,10 @@ def _init_channel_setting(setting):
         setting['start_msg'] = ''
     if 'wait_msg' not in setting:
         setting['wait_msg'] = -1
+    if 'target' not in setting:
+        setting['target'] = -1
+    if 'target_type' not in setting:
+        setting['target_type'] = ''
 
 class ChannelData:
     def __init__(self, setting: dict):
@@ -28,6 +32,8 @@ class ChannelData:
         self.last_stream_id = setting['last_stream_id']     # 最後追蹤到的直播 id
         self.text_channel = setting['text_channel']
         self.thread_id = setting['thread_id']
+        self.notified_target = setting['target']
+        self.notified_target_type = setting['target_type']
         # custom messages
         self.end_msg = setting['end_msg']
         self.start_msg = setting['start_msg']
@@ -46,5 +52,12 @@ class ChannelData:
             'end_msg': self.end_msg,
             'start_msg': self.start_msg,
             'wait_msg': self.wait_msg,
+            'target': self.notified_target,
+            'target_type': self.notified_target_type,
         }
         return setting
+
+    def Reset(self):
+        ''' Reset the channel status '''
+        self.last_stream_id = ''
+        self.stream_id = ''
