@@ -53,6 +53,7 @@ async def on_member_join(member: discord.Member):
 
 @tasks.loop(minutes=1)
 async def BotWorking():
+    print("UTC_TIMEZONE: ", os.environ['UTC_TIMEZONE'])
     await bot.DoTasks()
     for _, guild in bot.guilds.items():
         guild.UpdateGuildFile()
