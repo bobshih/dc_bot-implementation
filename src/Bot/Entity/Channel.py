@@ -40,7 +40,7 @@ class ChannelData:
         setting = {
             "id": self.id,
             "name": self.name,
-            "last_stram_id": self.last_stream_id,
+            "last_stream_id": self.last_stream_id,
             "text_channel": self.text_channel,
             "thread_id": self.thread_id,
             'end_msg': self.end_msg,
