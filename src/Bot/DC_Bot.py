@@ -9,6 +9,7 @@ from discord import (
     TextChannel as dTextChannel,
 )
 import requests
+import json
 from datetime import datetime
 from bs4 import BeautifulSoup
 from typing import Dict, List, Tuple
@@ -107,10 +108,15 @@ class Bot:
                 live_info = bot_utils.GetLiveStreamInfo(stream_data, channel_data.stream_id)
                 if live_info.live_status == 'upcoming':
                     channel_data.live = False
-                    # 檢查是否超過 7 天，如果超過七天就不通知
-                    if (live_info.scheduled_start_time - datetime.now()).days >= 7:
+                    # 檢查是否超過 1 天，如果超過 1 天就不通知
+                    if (live_info.scheduled_start_time - datetime.now()).days >= 1:
                         continue
-                    message = self.guilds[guild_id].GetWaitingMSG(channel_data.id, live_info)
+                    if channel_data.last_stream_id != channel_data.stream_id:
+                        # 未來的下一步直播會是下一個 last_stream_id，如果不同，表示有新的待機室產生，這時候就印出一次訊息
+                        message = self.guilds[guild_id].GetWaitingMSG(channel_data.id, live_info)
+                        channel_data.last_stream_id = channel_data.stream_id
+                    else:
+                        message = ''
                     if guild.using_thread:
                         result[guild_id].append((channel_data.text_channel, channel_data.thread_id, message))
                     else:
@@ -146,6 +152,10 @@ class Bot:
         for _, messages in guild_messages.items():
             # channel_id = self.guilds[guild_id].notify_text_channel
             for channel_id, thread_id, msg in messages:
+                if msg == '':           # 空字串不傳送
+                    continue
+                if channel_id == -1:    # 沒有設定文字 channel id
+                    continue
                 notify_channel: dTextChannel = await self.client.fetch_channel(channel_id)
                 await notify_channel.send(msg)
                 # 以後再處理 thread 問題，discord 版本需要到 2.0
@@ -155,17 +165,18 @@ class Bot:
         guild_id = message.guild.id
         channel = message.channel
         message_segs = message.content[len(BotPrefix):].strip().split(' ')
-        if len(message_segs) < 3:
+        if len(message_segs) < 2:
             await channel.send("看不懂的指令")
             return
-        command, sub_command = message_segs[:2]
-        content = message_segs[2:]
+        command, sub_commands = message_segs[0], message_segs[1:]
         if command == 'Welcome':
-            if sub_command == 'Channel':
-                self.guilds[guild_id].SetWelcomeChannel(int(content[0]))
-                await channel.send(f"已設定歡迎訊息頻道到: {content[0]}")
+            sub_commands = sub_commands[0]
+            content = sub_commands[1]
+            if sub_commands == 'Channel':
+                self.guilds[guild_id].SetWelcomeChannel(int(content))
+                await channel.send(f"已設定歡迎訊息頻道到: {content}")
                 return
-            elif sub_command == 'Text':
+            elif sub_commands == 'Text':
                 self.guilds[guild_id].SetWelcomeTxt(content)
                 await channel.send(f"已設定歡迎訊息: {' '.join(content)}")
                 return
@@ -173,15 +184,47 @@ class Bot:
                 await channel.send("看不懂的指令")
                 return
         elif command == 'Leave':
-            if sub_command == 'Channel':
-                self.guilds[guild_id].SetLeaveChannel(int(content[0]))
-                await channel.send(f"已設定離開訊息頻道到: {content[0]}")
+            sub_commands = sub_commands[0]
+            content = sub_commands[1]
+            if sub_commands == 'Channel':
+                self.guilds[guild_id].SetLeaveChannel(int(content))
+                await channel.send(f"已設定離開訊息頻道到: {content}")
                 return
-            elif sub_command == 'Text':
+            elif sub_commands == 'Text':
                 self.guilds[guild_id].SetLeaveTxt(content)
                 await channel.send(f"已設定離開訊息: {' '.join(content)}")
                 return
             else:
                 await channel.send("看不懂的指令")
+                return
+        elif command == "yt-notify":
+            if len(sub_commands) == 1:
+                if sub_commands[0] == 'list':
+                    channel_setting = self.guilds[guild_id].GetSetting()['channel']
+                    response = json.dumps(channel_setting, indent='    ', ensure_ascii=False)
+            if len(sub_commands) == 2:
+                if sub_commands[0] == 'add-new-channel':
+                    response = self.guilds[guild_id].AddDescribedChannel(sub_commands[1])
+                elif sub_commands[0] == 'update-general-notify-channel':
+                    self.guilds[guild_id].notify_text_channel = sub_commands[1]
+                    response = '[Success] yt 提醒通知的文字頻道已更新'
+                elif sub_commands[0] == 'update-general-end-msg':
+                    self.guilds[guild_id].end_stream_msg = sub_commands[1]
+                    response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                elif sub_commands[0] == 'update-general-start-msg':
+                    self.guilds[guild_id].start_stream_msg = sub_commands[1]
+                    response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                elif sub_commands[0] == 'update-general-wait-msg':
+                    self.guilds[guild_id].waiting_msg = sub_commands[1]
+                    response = '[Success] yt 提醒通知的一般結束訊息已更新'
+                else:
+                    await channel.send("看不懂的指令")
+            if len(sub_commands) == 3:
+                data_name, channel_id = sub_commands[0], sub_commands[1]
+                new_content = sub_commands[2]
+                response = self.guilds[guild_id].UpdateChannelData(channel_id, data_name, new_content)
+            self.guilds[guild_id].UpdateGuildFile()
+            if response != '':
+                await channel.send(response)
                 return
         await channel.send("看不懂的指令")
