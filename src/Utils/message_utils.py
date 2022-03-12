@@ -10,10 +10,10 @@ from ..Bot.Entity.Stream import StreamInfo
 def GetChannelRelatedMessage(ori_msg: str, channel_data: ChannelData, stream_info: StreamInfo)->str:
     utc_timezone = int(os.environ['UTC_TIMEZONE'])
     notified_target = "Unknown Target"
-    if channel_data.notified_target_type == 'tag':
-        notified_target = f"<@&{channel_data.notified_target}>"
-    elif channel_data.notified_target_type == 'id':
-        notified_target = f"<@{channel_data.notified_target}>"
+    if channel_data.target_type == 'tag':
+        notified_target = f"<@&{channel_data.target}>"
+    elif channel_data.target_type == 'id':
+        notified_target = f"<@{channel_data.target}>"
     # else:
     #     raise Exception(f"[Error] notified_target_type is invaildable fomr channel {channel_data.name}")
     # stream time related info

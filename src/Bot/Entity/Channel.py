@@ -32,8 +32,8 @@ class ChannelData:
         self.last_stream_id = setting['last_stream_id']     # 最後追蹤到的直播 id
         self.text_channel = setting['text_channel']
         self.thread_id = setting['thread_id']
-        self.notified_target = setting['target']
-        self.notified_target_type = setting['target_type']
+        self.target = setting['target']
+        self.target_type = setting['target_type']
         # custom messages
         self.end_msg = setting['end_msg']
         self.start_msg = setting['start_msg']
@@ -52,8 +52,8 @@ class ChannelData:
             'end_msg': self.end_msg,
             'start_msg': self.start_msg,
             'wait_msg': self.wait_msg,
-            'target': self.notified_target,
-            'target_type': self.notified_target_type,
+            'target': self.target,
+            'target_type': self.target_type,
         }
         return setting
 
