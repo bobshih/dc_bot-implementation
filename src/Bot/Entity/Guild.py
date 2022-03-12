@@ -183,6 +183,8 @@ class Guild_cls:
                         new_content = int(new_content)
                     else:
                         return f'[Error] {data_type} 只接受數字'
+                if ori_data == new_content:
+                    return f"[Success] 更新了 {channel_id} 的 {data_type} 沒有不同所以不更新"
                 setattr(channel_data, data_type, new_content)
                 self.UpdateGuildFile()
                 return f"[Success] 更新了 {channel_id} 的 {data_type} 為 {getattr(channel_data, data_type)}"
@@ -229,7 +231,10 @@ class Guild_cls:
                         response.append(self.AddDescribedChannel(cid))
                     for key, value in channel_setting.items():
                         if key == 'id': continue
-                        response.append(self.UpdateChannelData(cid, key, value))
+                        update_res = self.UpdateChannelData(cid, key, value)
+                        if '沒有不同' in update_res:
+                            continue
+                        response.append(update_res)
             return '\n'.join(response)
 
     def GetSetting(self)->dict:

@@ -210,7 +210,9 @@ class Bot:
             if len(sub_commands) == 1:
                 if sub_commands[0] == 'list':
                     channel_setting = self.guilds[guild_id].GetSetting()['channel']
-                    response = json.dumps(channel_setting, indent='    ', ensure_ascii=False)
+                    for cSetting in channel_setting:
+                        await channel.send(json.dumps(cSetting, indent='    ', ensure_ascii=False))
+                    response = "==" * 20
             if len(sub_commands) == 2:
                 if sub_commands[0] == 'add-new-channel':
                     response = self.guilds[guild_id].AddDescribedChannel(sub_commands[1])
@@ -268,6 +270,9 @@ class Bot:
             await channel.send(file=dFile(bot_utils.GetGuildDataFilePath(guild_id)))
             return
         if response != '':
+            if len(response) > 1500:
+                await channel.send("[Warning] response 長度過長，請用 get-guild-setting-file 確認結果")
+                return
             await channel.send(response)
             return
         await channel.send("看不懂的指令")
