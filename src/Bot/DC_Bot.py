@@ -13,6 +13,7 @@ from discord import (
     Message as dMessage,
     Client,
     TextChannel as dTextChannel,
+    File as dFile
 )
 from bs4 import BeautifulSoup
 import yaml
@@ -261,6 +262,10 @@ class Bot:
                 response = self.guilds[guild_id].UpdateBySetting(guild_data)
             else:
                 response = '[Error] 更新公會資訊的過程沒有正確 ID，請確認 setting 中有 [info][id] 的資訊'
+        elif command == 'get-guild-setting-file':
+            # 取得 guild setting file
+            self.guilds[guild_id].UpdateGuildFile()
+            await channel.send(file=dFile(bot_utils.GetGuildDataFilePath(guild_id)))
         if response != '':
             await channel.send(response)
             return
