@@ -25,9 +25,13 @@ def LoadGuildData(guild_id: str=None)->dict:
         total_guilds[int(guild_id)] = guild_data
     return total_guilds
 
+def GetGuildDataFilePath(guild_id: int):
+    ''' 取的儲存 Guild Data 的檔案路徑 '''
+    return guild_folder/f"{guild_id}.yaml"
+
 def SaveGuildData(guild_id: int, guild_data: dict):
     ''' 把 guild data 儲存到對應的檔案中 '''
-    guild_data_file = guild_folder/f"{guild_id}.yaml"
+    guild_data_file = GetGuildDataFilePath(guild_id)
     with guild_data_file.open('w', encoding='utf8') as fp:
         yaml.dump(guild_data, fp, allow_unicode=True)
 
