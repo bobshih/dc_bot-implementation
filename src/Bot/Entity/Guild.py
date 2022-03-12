@@ -14,7 +14,10 @@ def _init_guild_setting(guild_setting: dict={}, discord_guild: dGuild = None)->d
     ''' 初始化 guild setting '''
     if guild_setting == {}:
         guild_setting = {
-            'info':{},
+            'info':{
+                'name': '',
+                'id': -1
+            },
             'setting': {},
         }
     # guild related info
@@ -175,7 +178,7 @@ class Guild_cls:
                 if not hasattr(channel_data, data_type):
                     return '[Error] channel data 中並沒有此設定可以被更新'
                 ori_data = getattr(channel_data, data_type)
-                if type(ori_data) == int:
+                if type(ori_data) == int and type(new_content) != int:
                     if new_content.isdigit():
                         new_content = int(new_content)
                     else:
@@ -184,6 +187,51 @@ class Guild_cls:
                 self.UpdateGuildFile()
                 return f"[Success] 更新了 {channel_id} 的 {data_type} 為 {getattr(channel_data, data_type)}"
         return '[Error] 這個 channel id 並不在訂閱清單中，請先用 add-new-channel 進行訂閱'
+
+    def UpdateBySetting(self, new_guild_setting: dict)->str:
+        ''' 利用 setting 檔更新 guild 資訊 '''
+        # new_guild_setting = _init_guild_setting(guild_setting=new_guild_setting)
+        response = []
+        # info Section 只更新 name
+        if 'info' in new_guild_setting and 'name' in new_guild_setting['info']:
+            self.name = new_guild_setting['info']['name']
+        # setting Section 全部更新
+        if 'setting' in new_guild_setting:
+            if 'welcome_text' in new_guild_setting['setting']:
+                self.welcome_text = new_guild_setting['setting']['welcome_text']
+            if 'welcome_channel' in new_guild_setting['setting']:
+                self.welcome_channel = new_guild_setting['setting']['welcome_channel']
+            if 'leave_text' in new_guild_setting['setting']:
+                self.leave_text = new_guild_setting['setting']['leave_text']
+            if 'leave_channel' in new_guild_setting['setting']:
+                self.leave_channel = new_guild_setting['setting']['leave_channel']
+        # channel Section 全部更新
+        if 'channel' in new_guild_setting:
+            cSetting = new_guild_setting['channel']
+            # 一般設定有就更新
+            self.notify_text_channel = cSetting['notify_text_channel'] if 'notify_text_channel' in cSetting else self.notify_text_channel
+            self.waiting_msg = cSetting['waiting_msg'] if 'waiting_msg' in cSetting else self.waiting_msg
+            self.end_stream_msg = cSetting['end_stream_msg'] if 'end_stream_msg' in cSetting else self.end_stream_msg
+            self.start_stream_msg = cSetting['start_stream_msg'] if 'start_stream_msg' in cSetting else self.start_stream_msg
+            # channel_list 只更新新的 Channel ID 或是已知的 Channel ID 中被提及的
+            if 'channel_list' not in cSetting:
+                response.append('在 channel 內沒有 channel_list')
+            else:
+                for channel_setting in cSetting['channel_list']:
+                    cid = channel_setting['id']
+                    found_flag = False
+                    for channel_data in self.described_channels:
+                        if channel_data.id == cid:
+                            response.append('>>>>> 找到已知 Channel <<<<<')
+                            found_flag = True
+                            break
+                    if not found_flag:
+                        response.append(self.AddDescribedChannel(cid))
+                    for key, value in channel_setting.items():
+                        if key == 'id': continue
+                        response.append(self.UpdateChannelData(cid, key, value))
+                    response.append(self.ResetChannelStatus(cid))
+            return '\n'.join(response)
 
     def GetSetting(self)->dict:
         ''' 取出 setting dict '''
