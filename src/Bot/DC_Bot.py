@@ -2,17 +2,20 @@
     this class used to describe the actions of a bot in this project
 '''
 from collections import defaultdict
+import requests
+import json
+from datetime import datetime
+from typing import Dict, List, Tuple
+from urllib import request
+
 from discord import (
     Guild as dGuild,
     Message as dMessage,
     Client,
     TextChannel as dTextChannel,
 )
-import requests
-import json
-from datetime import datetime
 from bs4 import BeautifulSoup
-from typing import Dict, List, Tuple
+import yaml
 
 from .Entity import Guild_cls, Member
 from ..Utils import bot_utils
@@ -169,9 +172,9 @@ class Bot:
         guild_id = message.guild.id
         channel = message.channel
         message_segs = message.content[len(BotPrefix):].strip().split()
-        if len(message_segs) < 2:
-            await channel.send("看不懂的指令")
-            return
+        # if len(message_segs) < 2:
+        #     await channel.send("看不懂的指令")
+        #     return
         command, sub_commands = message_segs[0], message_segs[1:]
         response = ''
         if command == 'Welcome':
@@ -247,7 +250,18 @@ class Bot:
                     new_content = ' '.join(sub_commands[2:])
                     response = self.guilds[guild_id].UpdateChannelData(channel_id, data_name, new_content)
             self.guilds[guild_id].UpdateGuildFile()
-            if response != '':
-                await channel.send(response)
-                return
+        elif command == 'expand-guild-by-file':
+            # 取得第一個檔案進行擴充
+            attachment_data = await message.attachments[0].read()
+            attachment_data = attachment_data.decode('utf-8')
+            guild_data = yaml.safe_load(attachment_data)
+            # 擴充 guild data
+            if 'info' in guild_data and 'id' in guild_data['info']:
+                guild_id = guild_data['info']['id']
+                response = self.guilds[guild_id].UpdateBySetting(guild_data)
+            else:
+                response = '[Error] 更新公會資訊的過程沒有正確 ID，請確認 setting 中有 [info][id] 的資訊'
+        if response != '':
+            await channel.send(response)
+            return
         await channel.send("看不懂的指令")
