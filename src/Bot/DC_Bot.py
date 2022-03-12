@@ -210,8 +210,13 @@ class Bot:
             if len(sub_commands) == 1:
                 if sub_commands[0] == 'list':
                     channel_setting = self.guilds[guild_id].GetSetting()['channel']
-                    for cSetting in channel_setting:
-                        await channel.send(json.dumps(cSetting, indent='    ', ensure_ascii=False))
+                    for key, value in channel_setting.items():
+                        if key != 'channel_list':
+                            await channel.send(f"{key}: {value}")
+                        else:
+                            for cSetting in value:
+                                await channel.send(json.dumps(cSetting, indent='    ', ensure_ascii=False))
+                            await channel.send("-"*20)
                     response = "==" * 20
             if len(sub_commands) == 2:
                 if sub_commands[0] == 'add-new-channel':
