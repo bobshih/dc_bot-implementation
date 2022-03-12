@@ -117,7 +117,7 @@ class Guild_cls:
         msg, cid = '', -1
         for idx, channel_data in enumerate(self.described_channels):
             if channel_data.id == channel_id:
-                msg = channel_data.start_msg
+                msg = channel_data.wait_msg
                 cid = idx
                 break
         if msg == '':
@@ -130,7 +130,7 @@ class Guild_cls:
         msg, cid = '', -1
         for idx, channel_data in enumerate(self.described_channels):
             if channel_data.id == channel_id:
-                msg = channel_data.start_msg
+                msg = channel_data.end_msg
                 cid = idx
                 break
         if msg == '':
