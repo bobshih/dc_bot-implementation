@@ -230,7 +230,6 @@ class Guild_cls:
                     for key, value in channel_setting.items():
                         if key == 'id': continue
                         response.append(self.UpdateChannelData(cid, key, value))
-                    response.append(self.ResetChannelStatus(cid))
             return '\n'.join(response)
 
     def GetSetting(self)->dict:
