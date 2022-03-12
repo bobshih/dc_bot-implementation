@@ -266,6 +266,7 @@ class Bot:
             # 取得 guild setting file
             self.guilds[guild_id].UpdateGuildFile()
             await channel.send(file=dFile(bot_utils.GetGuildDataFilePath(guild_id)))
+            return
         if response != '':
             await channel.send(response)
             return
