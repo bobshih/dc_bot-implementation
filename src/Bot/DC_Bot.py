@@ -181,6 +181,7 @@ class Bot:
         response = ''
         if command == 'Welcome':
             # handle the content and its subcommand
+            content = sub_commands[1:]
             if len(sub_commands) == 2:
                 content = [sub_commands[1]]
             sub_commands = sub_commands[0]
@@ -197,6 +198,7 @@ class Bot:
                 return
         elif command == 'Leave':
             # handle the content and its subcommand
+            content = sub_commands[1:]
             if len(sub_commands) == 2:
                 content = [sub_commands[1]]
             sub_commands = sub_commands[0]
