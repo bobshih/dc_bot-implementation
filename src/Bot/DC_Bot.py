@@ -257,7 +257,6 @@ class Bot:
                     data_name, channel_id = sub_commands[0], sub_commands[1]
                     new_content = ' '.join(sub_commands[2:])
                     response = self.guilds[guild_id].UpdateChannelData(channel_id, data_name, new_content)
-            self.guilds[guild_id].UpdateGuildFile()
         elif command == 'expand-guild-by-file':
             # 取得第一個檔案進行擴充
             attachment_data = await message.attachments[0].read()
@@ -274,6 +273,7 @@ class Bot:
             self.guilds[guild_id].UpdateGuildFile()
             await channel.send(file=dFile(bot_utils.GetGuildDataFilePath(guild_id)))
             return
+        self.guilds[guild_id].UpdateGuildFile()
         if response != '':
             if len(response) > 1500:
                 await channel.send("[Warning] response 長度過長，請用 get-guild-setting-file 確認結果")
