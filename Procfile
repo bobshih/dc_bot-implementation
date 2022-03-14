@@ -1,2 +1,2 @@
 worker: python run.py
-clock: python clock.py
+worker: export FLASK_APP=clock  && flask run
