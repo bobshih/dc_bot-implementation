@@ -181,10 +181,8 @@ class Bot:
         response = ''
         if command == 'Welcome':
             # handle the content and its subcommand
-            if len(sub_commands) > 2:
-                content = ' '.join(sub_commands[1:])
-            else:
-                content = sub_commands[1]
+            if len(sub_commands) == 2:
+                content = [sub_commands[1]]
             sub_commands = sub_commands[0]
             if sub_commands == 'Channel':
                 self.guilds[guild_id].SetWelcomeChannel(int(content))
@@ -199,10 +197,8 @@ class Bot:
                 return
         elif command == 'Leave':
             # handle the content and its subcommand
-            if len(sub_commands) > 2:
-                content = ' '.join(sub_commands[1:])
-            else:
-                content = sub_commands[1]
+            if len(sub_commands) == 2:
+                content = [sub_commands[1]]
             sub_commands = sub_commands[0]
             if sub_commands == 'Channel':
                 self.guilds[guild_id].SetLeaveChannel(int(content))
