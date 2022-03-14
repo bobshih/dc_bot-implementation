@@ -180,8 +180,8 @@ class Bot:
         command, sub_commands = message_segs[0], message_segs[1:]
         response = ''
         if command == 'Welcome':
+            content = ' '.join(sub_commands[1:])
             sub_commands = sub_commands[0]
-            content = sub_commands[1]
             if sub_commands == 'Channel':
                 self.guilds[guild_id].SetWelcomeChannel(int(content))
                 await channel.send(f"已設定歡迎訊息頻道到: {content}")
@@ -194,8 +194,8 @@ class Bot:
                 await channel.send("看不懂的指令")
                 return
         elif command == 'Leave':
+            content = ' '.join(sub_commands[1:])
             sub_commands = sub_commands[0]
-            content = sub_commands[1]
             if sub_commands == 'Channel':
                 self.guilds[guild_id].SetLeaveChannel(int(content))
                 await channel.send(f"已設定離開訊息頻道到: {content}")
