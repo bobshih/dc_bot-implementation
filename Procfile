@@ -1,2 +1,3 @@
 worker: python run.py
-worker: export FLASK_APP=clock  && flask run
+clock: python clock.py
+web: gunicorn app:web_service
