@@ -8,7 +8,7 @@ heroku_link = os.environ['heroku_link']
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', seconds=3)#, minutes = 19)
+@sched.scheduled_job('interval', minutes = 19)
 def scheduled_job():
     conn = urllib.request.urlopen(heroku_link)
     print(conn.read())
