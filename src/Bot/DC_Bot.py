@@ -173,6 +173,7 @@ class Bot:
         guild_id = message.guild.id
         channel = message.channel
         message_segs = message.content[len(BotPrefix):].strip().split()
+        print(message_segs)
         # if len(message_segs) < 2:
         #     await channel.send("看不懂的指令")
         #     return
