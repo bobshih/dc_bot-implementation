@@ -80,7 +80,7 @@ class Bot:
             for channel_data in guild.described_channels:
                 if channel_data.live:       # 已經在 live 了，不用檢查了
                     continue
-                if channel_data.stream_id:  # 已經知道下一步 live stream id 了，不用再檢查
+                if channel_data.stream_id:  # 已經知道下一部 live stream id 了，不用再檢查
                     continue
                 page = requests.get(f"https://youtube.com/channel/{channel_data.id}/live")
                 page_soup = BeautifulSoup(page.text, 'html.parser')
@@ -106,6 +106,7 @@ class Bot:
             if guild.notify_text_channel == -1: continue
             for channel_data in guild.described_channels:
                 if channel_data.stream_id == '':                # 沒有 stream id 表示沒有待機室或是直播
+                    channel_data.live = False                   # 確保 Live flag 是正確的
                     continue
                 notified_channel = channel_data.text_channel if channel_data.text_channel != -1 else guild.notify_text_channel
                 yt_api_url = "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
@@ -248,6 +249,13 @@ class Bot:
                         await channel.send(response)
                         await self.DoTasks()
                         return
+                elif sub_commands[0] == 'get-status':
+                    status = self.guilds[guild_id].GetChannelStatus(sub_commands[1]
+                    )
+                    if status is not None:
+                        await channel.send(json.dumps(status))
+                        return
+                    response = "[Error] 沒有找到對應的頻道，請確認輸入的 Channel ID 是否正確"
                 else:
                     await channel.send("看不懂的指令")
             if len(sub_commands) >= 3:
