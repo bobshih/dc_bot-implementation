@@ -157,6 +157,13 @@ class Guild_cls:
                 channel_data.Reset()
                 return "[Success] 成功重制了頻道狀態"
         return "[Error] 沒有找到對應的頻道，請確認輸入的 Channel ID 是否正確"
+    
+    def GetChannelStatus(self, channel_id: str)-> dict:
+        ''' 取得當前 Channel 的狀態 '''
+        for channel_data in self.described_channels:
+            if channel_data.id == channel_id:
+                return channel_data.GetStatus()
+        return None
 
     def AddDescribedChannel(self, channel_id: str)->str:
         ''' 新增一個 channel，會輸出一個字串通知使用者結果如何 '''
