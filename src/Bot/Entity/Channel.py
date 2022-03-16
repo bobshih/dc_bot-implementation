@@ -42,7 +42,8 @@ class ChannelData:
         self.live = False
         self.stream_id = ''         # 正在 stream 的 id
     
-    def GetSetting(self):
+    def GetSetting(self)->dict:
+        ''' 取得設定，這是用來儲存用的，不是完全的 Channel 狀態，要取得 Channel 狀態請用 GetStatus '''
         setting = {
             "id": self.id,
             "name": self.name,
@@ -55,6 +56,13 @@ class ChannelData:
             'target': self.target,
             'target_type': self.target_type,
         }
+        return setting
+    
+    def GetStatus(self)->dict:
+        ''' 取得 Channel Status，並輸出 Json 字串 '''
+        setting = self.GetSetting()
+        setting['live'] = self.live
+        setting['stream_id'] = self.stream_id
         return setting
 
     def Reset(self):
