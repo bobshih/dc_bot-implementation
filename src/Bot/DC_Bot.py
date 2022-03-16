@@ -149,7 +149,7 @@ class Bot:
                         result[guild_id].append((notified_channel, channel_data.thread_id, message))
                     else:
                         result[guild_id].append((notified_channel, None, message))
-                elif live_info.live_status != 'upcoming' and live_info.live_status == 'live':
+                elif live_info.live_status != 'upcoming' and live_info.live_status != 'live':
                     channel_data.stream_id = ''
                     # 顯然哪裡有問題了
                     message = "我不知道為什麼會沒有第一時間抓到結束\n" + self.guilds[guild_id].GetEndMSG(channel_data.id, live_info)
@@ -264,7 +264,7 @@ class Bot:
                     status = self.guilds[guild_id].GetChannelStatus(sub_commands[1]
                     )
                     if status is not None:
-                        await channel.send(json.dumps(status))
+                        await channel.send(json.dumps(status, indent='    ', ensure_ascii=False))
                         return
                     response = "[Error] 沒有找到對應的頻道，請確認輸入的 Channel ID 是否正確"
                 else:
