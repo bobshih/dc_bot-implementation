@@ -149,6 +149,17 @@ class Bot:
                         result[guild_id].append((notified_channel, channel_data.thread_id, message))
                     else:
                         result[guild_id].append((notified_channel, None, message))
+                elif live_info.live_status != 'upcoming' and live_info.live_status == 'live':
+                    channel_data.stream_id = ''
+                    # 顯然哪裡有問題了
+                    message = "我不知道為什麼會沒有第一時間抓到結束\n" + self.guilds[guild_id].GetEndMSG(channel_data.id, live_info)
+                    channel_data.last_stream_id = channel_data.stream_id
+                    channel_data.stream_id = ''
+                    channel_data.live = False
+                    if guild.using_thread:
+                        result[guild_id].append((notified_channel, channel_data.thread_id, message))
+                    else:
+                        result[guild_id].append((notified_channel, None, message))
         return dict(result)
 
     async def DoTasks(self)->None:
