@@ -4,8 +4,8 @@ import urllib.request
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
-# heroku_link = os.environ['heroku_link']
-heroku_link = "http://127.0.0.1:5000/hello_world/local"
+heroku_link = os.environ['heroku_link']
+# heroku_link = "http://127.0.0.1:5000/hello_world/local"
 
 sched = BackgroundScheduler()
 
@@ -19,13 +19,13 @@ def scheduled_job():
 sched.start()
 
 # web service part
-from flask import Flask
+# from flask import Flask
 
-app = Flask(__name__)
-@app.route("/hello_world/<source>")
-def hello_world(source):
-    print("call once by {}".format(source))
-    return f"<p>Hello, {source}!</p>"
+# app = Flask(__name__)
+# @app.route("/hello_world/<source>")
+# def hello_world(source):
+#     print("call once by {}".format(source))
+#     return f"<p>Hello, {source}!</p>"
 
 #導入 Discord.py
 import discord
@@ -42,8 +42,6 @@ from src.Bot.Entity import Member_cls
 settings = Utils.Load_Setting()
 
 if __name__ == '__main__':
-    # app.run(host="0.0.0.0")
-
     # a bot
     bot = Bot(client, settings.google_api_key)
 
@@ -89,4 +87,4 @@ if __name__ == '__main__':
 
     BotWorking.start()
     client.run(settings.dc_bot_token) #TOKEN 在 Discord Developer 那邊「BOT」頁面裡面
-    app.run(host="0.0.0.0")
+    # app.run(host="0.0.0.0")
