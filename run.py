@@ -10,7 +10,7 @@ heroku_link = os.environ['heroku_link']
 sched = BackgroundScheduler()
 
 # @sched.scheduled_job('interval', minutes = 19)
-@sched.scheduled_job('interval', seconds = 4)
+@sched.scheduled_job('interval', minutes = 14)
 def scheduled_job():
     conn = urllib.request.urlopen(heroku_link)
     print(conn.read())
@@ -41,7 +41,15 @@ from src.Bot.Entity import Member_cls
 # 載入 setting
 settings = Utils.Load_Setting()
 
+import argparse
+import yaml
+
 if __name__ == '__main__':
+    # get configs
+    parser = argparse.ArgumentParser()
+    parser.add_argument("conifgs", nargs='+', type=str)
+    args = parser.parse_args()
+    
     # a bot
     bot = Bot(client, settings.google_api_key)
 
@@ -52,6 +60,17 @@ if __name__ == '__main__':
         print('目前登入身份：', client.user)
         for guild in client.guilds:
             bot.InitGuildData(guild)
+        # 載入設定
+        for url in args.configs:
+            print("load from: ", url)
+            conn = urllib.request.urlopen(url)
+            setting_str = conn.read().decode('utf8')
+            setting = yaml.safe_load(setting_str)
+            if 'info' in setting and 'id' in setting['info']:
+                guild_id = setting['info']['id']
+                response = bot.guilds[guild_id].UpdateBySetting(setting)
+            print(response)
+            print("==" * 20)
 
     @client.event
     #當有訊息時

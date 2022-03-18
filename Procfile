@@ -1,2 +1,2 @@
-worker: python run.py
-web: gunicorn web_service:app 
+worker: python run.py https://raw.githubusercontent.com/bobshih/bot_config/main/configs/DC_Bot/%E5%B0%8F%E7%A9%BA%E9%96%93%E8%A8%AD%E5%AE%9A.yaml https://raw.githubusercontent.com/bobshih/bot_config/main/configs/DC_Bot/%E6%98%9F%E7%A9%BA%E8%A8%AD%E5%AE%9A.yaml
+web: gunicorn web_service:app
