@@ -47,9 +47,8 @@ import yaml
 if __name__ == '__main__':
     # get configs
     parser = argparse.ArgumentParser()
-    parser.add_argument("conifgs", nargs='+', type=str)
+    parser.add_argument("configs", nargs='+', type=str)
     args = parser.parse_args()
-    
     # a bot
     bot = Bot(client, settings.google_api_key)
 
