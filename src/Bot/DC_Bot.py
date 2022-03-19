@@ -119,6 +119,7 @@ class Bot:
                     channel_data.live = False
                     # 檢查是否超過 1 天，如果超過 1 天就不通知
                     if (live_info.scheduled_start_time - datetime.now()).days >= 1:
+                        channel_data.stream_id = ''             # 重設 stream id，因為這個超過一天，一分鐘後再抓一次 Live stream id
                         continue
                     if channel_data.last_stream_id != channel_data.stream_id:
                         # 未來的下一步直播會是下一個 last_stream_id，如果不同，表示有新的待機室產生，這時候就印出一次訊息
