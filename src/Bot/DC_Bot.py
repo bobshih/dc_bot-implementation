@@ -117,7 +117,8 @@ class Bot:
                 live_info = bot_utils.GetLiveStreamInfo(stream_data, channel_data.stream_id)
                 if live_info.live_status == 'upcoming':
                     print(f"in upcoming, stream id: {channel_data.stream_id}, last_stream_id: {channel_data.last_stream_id}, live status: {channel_data.live}")
-                    channel_data.live = False
+                    # if channel_data.stream_id == channel_data.last_stream_id:
+                    #     continue
                     # 檢查是否超過 1 天，如果超過 1 天就不通知
                     if (live_info.scheduled_start_time - datetime.now()).days >= 1:
                         channel_data.stream_id = ''             # 重設 stream id，因為這個超過一天，一分鐘後再抓一次 Live stream id
@@ -126,6 +127,7 @@ class Bot:
                         # 未來的下一部直播會是下一個 last_stream_id，如果不同，表示有新的待機室產生，這時候就印出一次訊息
                         message = self.guilds[guild_id].GetWaitingMSG(channel_data.id, live_info)
                         channel_data.last_stream_id = channel_data.stream_id
+                        channel_data.live = False
                     else:
                         message = ''
                     if guild.using_thread:
