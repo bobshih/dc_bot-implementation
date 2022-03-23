@@ -138,6 +138,7 @@ class Bot:
                     print(f"in live start, stream id: {channel_data.stream_id}, last_stream_id: {channel_data.last_stream_id}, live status: {channel_data.live}")
                     # 切換成 live 模式，送出 live string
                     channel_data.live = True
+                    channel_data.last_stream_id = channel_data.stream_id
                     message = self.guilds[guild_id].GetStartNotifyMSG(channel_data.id, live_info)
                     if guild.using_thread:
                         result[guild_id].append((notified_channel, channel_data.thread_id, message))
