@@ -113,7 +113,11 @@ class Bot:
                     channel_data.stream_id, self.google_api_key
                 )
                 res = requests.get(yt_api_url)
-                stream_data = res.json()['items'][0]
+                try:
+                    stream_data = res.json()['items'][0]
+                except Exception as e:
+                    print(e)
+                    continue
                 live_info = bot_utils.GetLiveStreamInfo(stream_data, channel_data.stream_id)
                 if live_info.live_status == 'upcoming':
                     print(f"in upcoming, stream id: {channel_data.stream_id}, last_stream_id: {channel_data.last_stream_id}, live status: {channel_data.live}")
