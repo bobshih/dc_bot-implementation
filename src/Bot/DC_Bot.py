@@ -117,6 +117,7 @@ class Bot:
                     stream_data = res.json()['items'][0]
                 except Exception as e:
                     print(e)
+                    print(res.json())
                     continue
                 live_info = bot_utils.GetLiveStreamInfo(stream_data, channel_data.stream_id)
                 if live_info.live_status == 'upcoming':
