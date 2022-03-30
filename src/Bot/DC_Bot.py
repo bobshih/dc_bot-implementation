@@ -80,8 +80,8 @@ class Bot:
             for channel_data in guild.described_channels:
                 if channel_data.live:       # 已經在 live 了，不用檢查了
                     continue
-                if channel_data.stream_id:  # 已經知道下一部 live stream id 了，不用再檢查
-                    continue
+                # if channel_data.stream_id:  # 已經知道下一部 live stream id 了，不用再檢查
+                #     continue
                 page = requests.get(f"https://youtube.com/channel/{channel_data.id}/live")
                 page_soup = BeautifulSoup(page.text, 'html.parser')
                 # 取得轉址後的 html url
