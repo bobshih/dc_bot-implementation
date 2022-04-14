@@ -84,7 +84,7 @@ if __name__ == '__main__':
         if message.content == 'ping':
             await message.channel.send('pong')
         if message.content == 'ping 光年 routine':
-            await message.channel.send('pong')
+            await message.channel.send('<@221661791262867456>光年生日快樂')
 
     @client.event
     async def on_member_remove(member: discord.Member):
