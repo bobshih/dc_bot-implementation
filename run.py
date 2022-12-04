@@ -2,15 +2,6 @@
 import os
 import urllib.request
 
-# web service part
-# from flask import Flask
-
-# app = Flask(__name__)
-# @app.route("/hello_world/<source>")
-# def hello_world(source):
-#     print("call once by {}".format(source))
-#     return f"<p>Hello, {source}!</p>"
-
 #導入 Discord.py
 import discord
 from discord.ext import tasks
